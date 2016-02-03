@@ -168,6 +168,16 @@ module.exports = function(grunt) {
 				}
 			},
 
+			semantic_if: {
+				options: {
+					semanticIf: true
+				},
+
+				files: {
+					"tmp/semantic_if.html": "test/fixtures/semantic_if.html"
+				}
+			},
+
 			format_bake: {
 				files: {
 					"tmp/format_bake.html": "test/fixtures/format_bake.html"
@@ -310,6 +320,40 @@ module.exports = function(grunt) {
 
 				files: {
 					"tmp/transform_single.html": "test/fixtures/transform_single.html"
+				}
+			},
+
+			transform_params: {
+				options: {
+					content: {
+						content: {
+							"string": "Bake",
+							"array": [
+								"Jim",
+								"John",
+								"James",
+								"Jonathan"
+							]
+						}
+					},
+					transforms: {
+						repeat: function( string, times ) {
+							return new Array( parseInt( times, 10) + 1 ).join( String( string ) );
+						},
+						replace: function( string, searchvalue, newvalue ) {
+							return String( string ).replace( searchvalue, newvalue );
+						},
+						max: function( array, limit ) {
+							return array.slice( 0, limit );
+						},
+						join: function( array, glue ) {
+							return array.join( glue );
+						}
+					}
+				},
+
+				files: {
+					"tmp/transform_params.html": "test/fixtures/transform_params.html"
 				}
 			},
 

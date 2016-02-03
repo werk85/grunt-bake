@@ -166,12 +166,16 @@ transforms: {
 }
 ```
 
-#### options.transformGutter
-Type: `String`
-Default value: '|'
+Transforms support parameters like `{{myvar | replace:'A':'B'}}`. Parameters are handed into the callback as additional parameters.
 
-Sequence used to split transforms.
-
+```js
+transforms: {
+    // str => content of myvar,  searchvalue => 'A',  newvalue => 'B'
+    replace: function(str, searchvalue, newvalue) {
+        return String(str).replace(searchvalue, newvalue);
+    }
+}
+```
 
 #### options.semanticIf
 Type: `Bool` | `Array` | `Function`
@@ -663,5 +667,6 @@ watch: {
 
 ## Changelog
 
+`1.4.0`    __1-30-2016__    adds full JS support for evaluating _if.
 `1.3.1`    __1-20-2016__    adds support for parsing values in inline variables.
 `1.3.0`    __1-13-2016__    adds support for parsing file paths in bake tag.
