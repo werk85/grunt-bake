@@ -55,42 +55,51 @@ module.exports = function( grunt ) {
 		// This process method is used when no process function is supplied.
 		function defaultProcess( template, content ) {
 			return template.replace( options.parsePattern, function( match, inner ) {
+				var processed = processPlaceholder( inner, content );
 
-				// extract transforms from placeholder
-				var transforms = inner.match( transformsRegex ).map( function( str ) {
-
-					// remove whitespace, otherwise transforms and variable key may not be found
-					str = mout.string.trim( str );
-
-					// extract name of transform and transform parameters, and clear quotes
-					var parts = str.match( paramsRegex ).map( function( str ) {
-						return mout.string.trim( str, "'" );
-					});
-
-					return {
-						name: parts[0],
-						params: parts.slice(1)
-					};
-				});
-
-				// the first value is the set that contains our variable key, and not a transfrom
-				var key = transforms.shift().name;
-				var resolved = resolveName( key, content );
-
-				if( resolved === undefined && !options.removeUndefined ) {
+				if( processed === undefined && !options.removeUndefined ) {
 					return match;
 				}
 
-				return transforms.reduce( applyTransform, resolved );
-			} );
+				return processed;
+			});
 		}
 
 		if ( ! options.hasOwnProperty( "process" ) ) {
 			options.process = defaultProcess;
 		}
 
+		function processPlaceholder( placeholder, values ) {
+			// extract transforms from placeholder
+			var transforms = placeholder.match( transformsRegex ).map( function( str ) {
+
+				// remove whitespace, otherwise transforms and variable key may not be found
+				str = mout.string.trim( str );
+
+				// extract name of transform and transform parameters, and clear quotes
+				var parts = str.match( paramsRegex ).map( function( str ) {
+					return mout.string.trim( str, "'" );
+				});
+
+				return {
+					name: parts[0],
+					params: parts.slice(1)
+				};
+			});
+
+			// the first value is the set that contains our variable key, and not a transfrom
+			var key = transforms.shift().name;
+			var resolved = resolveName( key, values );
+
+			return transforms.reduce( applyTransform, resolved );
+		}
+
 		function applyTransform( content, transform ) {
 			var name = transform.name;
+
+			if( content === undefined ) {
+				return;
+			}
 
 			// check if transform is registred
 			if( ! mout.object.has( options.transforms, name ) ) {
@@ -249,7 +258,7 @@ module.exports = function( grunt ) {
 				return string.match( arrayRegex )[ 1 ].split( "," );
 
 			else {
-				var array = resolveName( string, values );
+				var array = processPlaceholder( string, values );
 				if ( ! mout.lang.isArray( array ) ) array = [];
 
 				return array;
@@ -340,14 +349,15 @@ module.exports = function( grunt ) {
 
 			if ( "_foreach" in inlineValues ) {
 
-				var pair = inlineValues[ "_foreach" ].split( ":" );
+				var set = inlineValues[ "_foreach" ].split( ":" );
 				delete inlineValues[ "_foreach" ];
 
-				getArrayValues( pair[ 1 ], values ).forEach( function( value ) {
+				// as transforms may contain colons, join rest of list to recreate original string
+				getArrayValues( set.slice(1).join( ":" ), values ).forEach( function( value ) {
 					array.push( value );
 				} );
 
-				return pair[ 0 ];
+				return set[ 0 ];
 			}
 
 			return null;
