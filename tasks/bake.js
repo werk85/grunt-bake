@@ -153,7 +153,6 @@ module.exports = function( grunt ) {
 			return true;
 		}
 
-
 		// Returns the directory path from a file path
 
 		function directory( path ) {
@@ -164,6 +163,13 @@ module.exports = function( grunt ) {
 			return segments.join( "/" );
 		}
 
+		// Returns the filename from a file path
+
+		function filename( path ) {
+			var segments = path.split( "/" );
+
+			return segments.pop();
+		}
 
 		// Parses attribute string.
 
@@ -349,7 +355,7 @@ module.exports = function( grunt ) {
 
 		// Handle _bake attributes in inline arguments
 
-		function validateExtraBake( inlineValues ) {
+		function validateBake( inlineValues ) {
 			if ( "_bake" in inlineValues ) {
 
 				var signature = inlineValues[ "_bake" ];
@@ -382,7 +388,17 @@ module.exports = function( grunt ) {
 			var src = preparePath( bake.src, filePath, values );
 			var dest = preparePath( bake.dest, destFile, values );
 
+			// inject variable to link to dynamically processed file
 			values[ "@link" ] = processContent( bake.dest, values );
+
+			// compute the depth of the destination path
+			var parentDirsCount = bake.dest.split( "/" ).length - 1;
+
+			// create a prefix for building a link to parent folder
+			var parentDirsString = new Array( parentDirsCount + 1 ).join( "../" );
+
+			// inject variable to link to file that triggered the dynamic creation, from dynamically processed file
+			values[ "@referrer" ] = parentDirsString + filename( destFile );
 
 			bakeFile( src, dest, values );
 		}
@@ -398,7 +414,7 @@ module.exports = function( grunt ) {
 		function replaceString( includeContent, linebreak, indent, includePath, attributes, filePath, destFile, values ) {
 			var inlineValues = parseInlineValues( attributes );
 			var section = validateSection( inlineValues, values );
-			var extraBake = validateExtraBake( inlineValues );
+			var extraBake = validateBake( inlineValues );
 
 			if ( section !== null ) {
 				values = values[ section ];
