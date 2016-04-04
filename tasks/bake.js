@@ -31,12 +31,17 @@ module.exports = function( grunt ) {
 		} );
 
 
+		// warning about removed parameter
+
+		if ( options.transformGutter !== undefined ) {
+			grunt.log.error( "Parameter `transformGutter` is no longer supported and defaults to `|`. See #71 for details." );
+		}
+
 		// normalize basePath
 
 		if ( options.basePath.substr( -1 , 1 ) !== "/" && options.basePath.length > 0 ) {
 			options.basePath = options.basePath + "/";
 		}
-
 
 		// normalize content
 
@@ -48,6 +53,15 @@ module.exports = function( grunt ) {
 			options.content = options.content ? options.content : {};
 		}
 
+		if ( options.section ) {
+
+			if ( ! options.content[ options.section ] ) {
+				grunt.log.error( "content doesn't have section " + options.section );
+			}
+
+			options.content = options.content[ options.section ];
+		}
+
 		// =======================
 		// -- DEFAULT PROCESSOR --
 		// =======================
@@ -57,8 +71,8 @@ module.exports = function( grunt ) {
 			return template.replace( options.parsePattern, function( match, inner ) {
 				var processed = processPlaceholder( inner, content );
 
-				if( processed === undefined && !options.removeUndefined ) {
-					return match;
+				if( processed === undefined ) {
+					processed = ( ! options.removeUndefined ? match : "" );
 				}
 
 				return processed;
@@ -204,8 +218,8 @@ module.exports = function( grunt ) {
 
 			if( match = signatureRegex.exec( signature ) ) {
 				result = {
-					includePath: match[1],
-					attributes: match[2],
+					includePath: match[ 1 ],
+					attributes: match[ 2 ],
 					signature: signature
 				};
 
@@ -293,7 +307,7 @@ module.exports = function( grunt ) {
 						resolved = options.semanticIf( resolved );
 					}
 
-					params[varname] = resolved;
+					params[ varname ] = resolved;
 
 					return "params['" + varname + "']";
 				});
@@ -427,7 +441,7 @@ module.exports = function( grunt ) {
 			var extraBake = validateBake( inlineValues );
 
 			if ( section !== null ) {
-				values = values[ section ];
+				values = mout.object.get( values, section );
 			}
 
 			// resolve placeholders within inline values so these can be used in subsequent grunt-tags (see #67)
@@ -586,15 +600,6 @@ module.exports = function( grunt ) {
 			var dest = file.dest;
 
 			if ( ! checkFile( src ) ) return;
-
-			if ( options.section ) {
-
-				if ( ! options.content[ options.section ] ) {
-					grunt.log.error( "content doesn't have section " + options.section );
-				}
-
-				options.content = options.content[ options.section ];
-			}
 
 			bakeFile( src, dest, options.content );
 		} );

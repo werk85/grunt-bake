@@ -670,8 +670,13 @@ watch: {
 
 ## Changelog
 
-`1.5.0`    __2-2-2016__     adds support for _bake attribute.
-`1.4.1`    __2-2-2016__     fixes minor bug fix #72.
-`1.4.0`    __1-30-2016__    adds full JS support for evaluating _if.
-`1.3.1`    __1-20-2016__    adds support for parsing values in inline variables.
-`1.3.0`    __1-13-2016__    adds support for parsing file paths in bake tag.
+* `1.6.3`    __2-26-2016__    Allow inline section attribute to have multiple leves.
+* `1.6.2`    __2-26-2016__    Update dependecies.
+* `1.6.1`    __2-11-2016__    fixes error for options.section on multiple files.
+* `1.6.0`    __2-10-2016__    adds support for parameters in transforms. Also introduces a breaking change away from transformGutter.
+* `1.5.1`    __2-9-2016__     adds @referrer attribute to _bake.
+* `1.5.0`    __2-2-2016__     adds support for _bake attribute.
+* `1.4.1`    __2-2-2016__     fixes minor bug fix #72.
+* `1.4.0`    __1-30-2016__    adds full JS support for evaluating _if.
+* `1.3.1`    __1-20-2016__    adds support for parsing values in inline variables.
+* `1.3.0`    __1-13-2016__    adds support for parsing file paths in bake tag.

@@ -33,9 +33,7 @@ module.exports = function(grunt) {
 			}
 		},
 
-		clean: {
-			tests: [ "tmp" ],
-		},
+		clean: [ "tmp" ],
 
 		nodeunit: {
 			tests: [ "test/*_test.js" ],
@@ -79,6 +77,18 @@ module.exports = function(grunt) {
 
 				files: {
 					"tmp/advanced_bake.html": "test/fixtures/advanced_bake.html"
+				}
+			},
+
+			advanced_bake_multi: {
+				options: {
+					content: "test/fixtures/content.json",
+					section: "en"
+				},
+
+				files: {
+					"tmp/advanced_bake_multi_one.html": "test/fixtures/advanced_bake_multi_one.html",
+					"tmp/advanced_bake_multi_two.html": "test/fixtures/advanced_bake_multi_two.html"
 				}
 			},
 
@@ -237,6 +247,12 @@ module.exports = function(grunt) {
 						},
 						about: {
 							title: "About"
+						},
+						books: {
+							theDarkTower: {
+								author: "Stephen King",
+								title: "The Dark Tower"
+							}
 						}
 					}
 				},
